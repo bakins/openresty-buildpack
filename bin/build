@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -e
+#sudo apt-get -y install make ruby1.9.1 ruby1.9.1-dev git-core libpcre3-dev subversion libxslt1-dev libgd2-xpm-dev libgeoip-dev unzip zip build-essential
+
+VERSION=$1
+if [ -z "$VERSION" ]; then
+    VERSION="1.2.8.6"
+fi
+
+BUILD_DIR=/tmp/openresty-$VERSION-build
+INSTALL_DIR=$BUILD_DIR/install/openresty-$VERSION
+mkdir -p $BUILD_DIR
+mkdir -p $INSTALL_DIR
+cd $BUILD_DIR
+
+curl -s -z ngx_openresty-$VERSION.tar.gz -O http://openresty.org/download/ngx_openresty-$VERSION.tar.gz
+tar -zxf ngx_openresty-$VERSION.tar.gz
+
+pushd ngx_openresty-$VERSION
+./configure --with-luajit --prefix=$INSTALL_DIR
+make
+make install
+popd
+
+LUAROCKS=2.0.13
+curl -s -z luarocks-$LUAROCKS.tar.gz -O http://luarocks.org/releases/luarocks-$LUAROCKS.tar.gz
+tar -zxf luarocks-$LUAROCKS.tar.gz
+pushd luarocks-$LUAROCKS
+./configure --lua-suffix=jit --with-lua=$INSTALL_DIR/luajit/ --with-lua-include=$INSTALL_DIR/luajit/include/luajit-2.0/ --prefix=$INSTALL_DIR --lua-version=5.1
+make
+make install
+popd
+
+pushd $BUILD_DIR/install
+tar -cf - openresty-$VERSION | gzip -9 - > openresty-$VERSION.tar.gz
+popd
+
+echo "OpenResty tarball is at $BUILD_DIR/install/openresty-$VERSION.tar.gz"
