@@ -1,0 +1,11 @@
+local slt2 = require('slt2')
+
+local tmpl = slt2.loadfile(arg[1])
+
+io.write(slt2.render(tmpl,
+		     {
+			 LUA_PACKAGE_PATH  = "$prefix/vendor/rocks/share/lua/5.1/?.lua;$prefix/vendor/openresty/lualib/?.lua",
+			 LUA_PACKAGE_CPATH ="$prefix/vendor/rocks/lib/lua/5.1/?.so;$prefix/vendor/openresty/lualib/?.so"
+		     }
+		    )
+	)

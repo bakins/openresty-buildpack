@@ -1,0 +1,6 @@
+# sample openresty buld file.
+# currently openresty stanza *must* come before any rock statements
+openresty "1.2.8.6"
+
+rock https://raw.github.com/Neopallium/lua-pb/master/lua-pb-scm-0.rockspec
+rock https://raw.github.com/bakins/lua-resty-riak/master/lua-resty-riak-0.2.1-1.rockspec

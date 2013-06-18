@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# bin/detect <build-dir>
+
+if [[ $(ls $1/OPENRESTY 2> /dev/null | wc -l) -gt 0 ]]; then
+  echo "OpenResty" && exit 0
+else
+  echo "no" && exit 1
+fi

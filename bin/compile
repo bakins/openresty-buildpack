@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+set -e
+
+BUILD_DIR=$1
+
+BIN_DIR=$(cd $(dirname $0); cd ..; pwd)/bin
+LIB_DIR=$(cd $(dirname $0); cd ..; pwd)/lib
+
+function openresty {
+    VERSION=$1
+    if [ -z "$VERSION" ]; then
+	VERSION=1.2.8.6
+    fi
+    MIRROR=$2
+    if [ -z "$MIRROR" ]; then
+	MIRROR="http://www.akins.org/openresty"
+    fi
+    FILE=openresty-$VERSION.tar.gz
+    TARBALL=/tmp/$FILE
+    curl -s -o $TARBALL -z $TARBALL $MIRROR/$FILE
+
+    pushd $BUILD_DIR/vendor
+    tar -zxf /tmp/$FILE
+    ln -sf openresty-$VERSION openresty
+    popd
+
+    pushd $BUILD_DIR/bin
+    ln -sf ../vendor/openresty-$VERSION/nginx/sbin/nginx nginx
+    ln -sf ../vendor/openresty-$VERSION/luajit/bin/luajit luajit
+    ln -sf ../vendor/openresty/luarocks/bin/luarocks-5.1 luarocks
+    popd
+
+    mkdir -p $BUILD_DIR/vendor/openresty/luarocks/share/lua/5.1/luarocks/
+    cat << EOF > $BUILD_DIR/vendor/openresty/luarocks/share/lua/5.1/luarocks/site_config.lua
+module("luarocks.site_config")
+LUAROCKS_PREFIX=[[$BUILD_DIR/vendor/openresty/luarocks/luarocks]]
+LUA_INCDIR=[[$BUILD_DIR/vendor/openresty/luajit/include/luajit-2.0]]
+LUA_LIBDIR=[[$BUILD_DIR/vendor/openresty/luajit/lib]]
+LUA_BINDIR=[[$BUILD_DIR/vendor/openresty/luajit/bin]]
+LUA_INTERPRETER=[[luajit]]
+LUAROCKS_SYSCONFDIR=[[$BUILD_DIR/vendor/openresty/luarocks/etc/luarocks]]
+LUAROCKS_ROCKS_TREE=[[$BUILD_DIR/vendor/openresty/luarocks]]
+LUAROCKS_ROCKS_SUBDIR=[[/lib/luarocks/rocks]]
+LUA_DIR_SET=true
+LUAROCKS_UNAME_S=[[Linux]]
+LUAROCKS_UNAME_M=[[x86_64]]
+LUAROCKS_DOWNLOADER=[[wget]]
+LUAROCKS_MD5CHECKER=[[md5sum]]
+EOF
+
+    cp $LIB_DIR/slt2.lua $BUILD_DIR/vendor/openresty/luarocks/share/lua/5.1/
+}
+
+TREE=$BUILD_DIR/vendor/rocks
+mkdir -p $TREE
+
+export LUA_PATH="$BUILD_DIR/vendor/openresty/luarocks/share/lua/5.1/?.lua;;"
+LUAROCKS="$BUILD_DIR/bin/luajit $BUILD_DIR/bin/luarocks"
+
+function rock {
+    ROCK=$1
+    VERSION=$2
+    $LUAROCKS install --tree=$TREE $ROCK $VERSION
+}
+
+
+mkdir -p $BUILD_DIR/vendor
+mkdir -p $BUILD_DIR/bin
+cp $BIN_DIR/start-nginx $BUILD_DIR/bin
+cp $BIN_DIR/render_template $BUILD_DIR/bin
+source $BUILD_DIR/OPENRESTY
