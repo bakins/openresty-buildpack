@@ -3,5 +3,5 @@ set -e
 export PATH=./bin:$PATH
 export LD_LIBRARY_PATH=./vendor/openresty/luajit/lib/
 export PORT=${PORT:-5000}
-LUA_PATH="./vendor/openresty/luarocks/share/lua/5.1/?.lua;;" luajit bin/render_template nginx.slt > nginx.conf
+LUA_CPATH="./vendor/rocks/lib/lua/5.1/?.so;;" LUA_PATH="./vendor/openresty/luarocks/share/lua/5.1/?.lua;;" luajit bin/render_template nginx.slt > nginx.conf
 exec bin/nginx -p . -c nginx.conf
