@@ -9,7 +9,7 @@ The `start_nginx` script is used to start nginx. It handles the template renderi
 # OPENRESTY file
 each project should include an `OPENRESTY` file. This file is actually bash and is used by the `compile` script. It supports two directives, as well as normal shell:
 
-* `openresty 'version'` or `openresty 'version' 'mirror' - specify the version of openresty to use. This currently must be before any `rock` stanzas.  The binaries of openresty are stored in a mirror with the path `$MIRROR/openresty-$VERSION.tar,gz` you can pass the mirror as the second argument to openresty
+* `openresty 'version'` or `openresty 'version' 'mirror'` - specify the version of openresty to use. This currently must be before any `rock` stanzas.  The binaries of openresty are stored in a mirror with the path `$MIRROR/openresty-$VERSION.tar,gz` you can pass the mirror as the second argument to openresty
 * `rock 'name'` or ``rock 'name' 'version'` or `rock 'url'`- install a Lua rock, either by name, which will use the standard luarocks mirror, or by url.
 
 # template variables
