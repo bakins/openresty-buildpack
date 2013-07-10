@@ -67,6 +67,7 @@ function rock {
 mkdir -p $BUILD_DIR/vendor
 mkdir -p $BUILD_DIR/bin
 mkdir -p $BUILD_DIR/tmp
+mkdir -p $BUILD_DIR/logs
 
 cp $BIN_DIR/start-nginx $BUILD_DIR/bin
 cp $BIN_DIR/render_template $BUILD_DIR/bin
