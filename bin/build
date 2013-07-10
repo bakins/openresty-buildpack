@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e
-#sudo apt-get -y install make ruby1.9.1 ruby1.9.1-dev git-core libpcre3-dev subversion libxslt1-dev libgd2-xpm-dev libgeoip-dev unzip zip build-essential
+sudo apt-get -y install git-core libpcre3-dev unzip build-essential
 
 VERSION=$1
 if [ -z "$VERSION" ]; then
@@ -16,8 +16,25 @@ cd $BUILD_DIR
 curl -s -z ngx_openresty-$VERSION.tar.gz -O http://openresty.org/download/ngx_openresty-$VERSION.tar.gz
 tar -zxf ngx_openresty-$VERSION.tar.gz
 
+if [ ! -d nginx_upstream_check_module ]; then
+    git clone https://github.com/yaoweibin/nginx_upstream_check_module.git
+fi
+
+pushd nginx_upstream_check_module
+NUCM=`pwd`
+git pull
+popd
+
 pushd ngx_openresty-$VERSION
-./configure --with-luajit --prefix=$INSTALL_DIR
+
+pushd bundle/nginx-1.2.8
+patch -p1 < $NUCM/check_1.2.6+.patch
+popd
+
+./configure \
+--with-luajit \
+--prefix=$INSTALL_DIR \
+--add-module=$NUCM
 make
 make install
 popd
