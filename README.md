@@ -2,6 +2,8 @@
 
 This is an heroku style buildpack for running openresty.  It varies from various others I have found in that it does not bundle binaries in the repo. It is also written almost entirely in shell.
 
+For an example see the [openresty-example-app](https://github.com/bakins/openresty-example-app)
+
 # start-nginx and nginx.slt
 You should include your nginx configuration in a file `nginx.slt` in the root of your project. [Simple Lua Template](https://github.com/henix/slt2) is used to render this to `nginx.conf`
 The `start_nginx` script is used to start nginx. It handles the template rendering as well as setting some environment variables. Note, you should set `daemon off` in your nginx config.
