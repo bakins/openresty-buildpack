@@ -34,6 +34,7 @@ popd
 ./configure \
 --with-luajit \
 --prefix=$INSTALL_DIR \
+--with-http_stub_status_module \
 --add-module=$NUCM
 make
 make install
