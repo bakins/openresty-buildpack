@@ -1,0 +1,44 @@
+worker_processes #{= os.getenv("WORKERS") };
+master_process off;
+error_log stderr warn;
+daemon off;
+pid ./tmp/nginx.pid;
+
+events {
+    worker_connections #{= os.getenv("CONNECTIONS") };
+}
+
+http {
+    lua_package_path "?.lua;#{= os.getenv("LUA_PATH") };;";
+    lua_package_cpath "#{= os.getenv("LUA_CPATH") };;";
+
+    init_by_lua 'require("#{= os.getenv("APP") }")';
+
+    access_log off;
+
+    gzip            on;
+    gzip_min_length 1000;
+    gzip_proxied    any;
+    gzip_types      text/plain application/xml application/json;
+    lua_socket_log_errors off;
+    lua_socket_pool_size 128;
+    variables_hash_max_size 1024;
+    variables_hash_bucket_size 128;
+
+    #{ for _,v in ipairs({ "client_body", "proxy", "fastcgi", "uwsgi", "scgi"}) do }
+    #{= v }_temp_path ./tmp/#{= v }_temp 1 1;
+    #{ end }
+
+    server {
+        listen #{= os.getenv("PORT") };
+
+        #{ if os.getenv("NGINX_INCLUDE") then }
+        include #{= os.getenv("NGINX_INCLUDE") };
+        #{ end }
+
+        location / {
+            default_type text/html;
+            content_by_lua 'require("#{= os.getenv("APP") }").run(ngx)';
+        }
+    }
+}

@@ -1,10 +1,20 @@
 #!/usr/bin/env bash
 set -e
+
 export PATH=./bin:$PATH
-export LD_LIBRARY_PATH=./vendor/openresty/luajit/lib/
+export LD_LIBRARY_PATH=./vendor/openresty/embedded/lib:./vendor/openresty/embedded/luajit/lib:$LD_LIBRARY_PATH
 export PORT=${PORT:-5000}
-LUA_CPATH="./vendor/rocks/lib/lua/5.1/?.so;;" LUA_PATH="./vendor/openresty/luarocks/share/lua/5.1/?.lua;;" luajit bin/render_template nginx.slt > nginx.conf
-touch logs/access.log logs/error.log
-PID=$$
-(tail -qF -n 0 --pid=$PID logs/*.log &)
-exec bin/nginx -p . -c nginx.conf
+export WORKERS=${WORKERS:-4}
+export CONNECTIONS=${CONNECTIONS:-8192}
+export APP=${APP:-"app"}
+export LUA_CPATH="./vendor/openresty/embedded/luajit/lib/lua/5.1/?.so;;"
+export LUA_PATH="./vendor/openresty/embedded/luajit/share/lua/5.1/?.lua;;"
+
+if [ -r config.slt ]; then
+    luajit bin/render_template config.slt > tmp/config.conf
+    export NGINX_INCLUDE=config.conf
+fi
+
+luajit bin/render_template vendor/nginx.slt > tmp/nginx.conf
+
+exec bin/nginx -p . -c tmp/nginx.conf

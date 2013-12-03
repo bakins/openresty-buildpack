@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
+set -x
 set -e
 
 BUILD_DIR=$1
 
 BIN_DIR=$(cd $(dirname $0); cd ..; pwd)/bin
 LIB_DIR=$(cd $(dirname $0); cd ..; pwd)/lib
+SUPPORT_DIR=$(cd $(dirname $0); cd ..; pwd)/support
+
+export LD_LIBRARY_PATH="$BUILD_DIR/vendor/openresty/embedded/lib:$LD_LIBRARY_PATH"
+export LUA_CPATH="$BUILD_DIR/vendor/openresty/embedded/luajit/lib/lua/5.1/?.so;;"
+export LUA_PATH="$BUILD_DIR/vendor/openresty/embedded/luajit/share/lua/5.1/?.lua;;"
 
 function openresty {
     VERSION=$1
     if [ -z "$VERSION" ]; then
-	VERSION=1.2.8.6
+	VERSION=1.4.2.5-1
     fi
     MIRROR=$2
     if [ -z "$MIRROR" ]; then
@@ -25,9 +31,9 @@ function openresty {
     popd
 
     pushd $BUILD_DIR/bin
-    ln -sf ../vendor/openresty-$VERSION/nginx/sbin/nginx nginx
-    ln -sf ../vendor/openresty-$VERSION/luajit/bin/luajit luajit
-    ln -sf ../vendor/openresty/luarocks/bin/luarocks luarocks
+    ln -sf ../vendor/openresty/sbin/nginx
+    ln -sf ../vendor/openresty/embedded/luajit/bin/luajit luajit
+    ln -sf ../vendor/openresty/embedded/luajit/bin/luarocks luarocks
     popd
 
     mkdir -p $BUILD_DIR/vendor/openresty/luarocks/share/lua/5.1/luarocks/
@@ -48,17 +54,17 @@ LUAROCKS_DOWNLOADER=[[wget]]
 LUAROCKS_MD5CHECKER=[[md5sum]]
 EOF
 
-    cp $LIB_DIR/slt2.lua $BUILD_DIR/vendor/openresty/luarocks/share/lua/5.1/
+    cp $LIB_DIR/slt2.lua $BUILD_DIR/vendor/openresty/embedded/luajit/share/lua/5.1
 }
 
 TREE=$BUILD_DIR/vendor/rocks
 mkdir -p $TREE
 
-export LUA_PATH="$BUILD_DIR/vendor/openresty/luarocks/share/lua/5.1/?.lua;;"
 LUAROCKS="$BUILD_DIR/bin/luajit $BUILD_DIR/bin/luarocks"
 
 function rock {
     ROCK=$1
+    echo $LUA_PATH
     VERSION=$2
     $LUAROCKS install --tree=$TREE $ROCK $VERSION
 }
@@ -71,4 +77,5 @@ mkdir -p $BUILD_DIR/logs
 
 cp $BIN_DIR/start-nginx $BUILD_DIR/bin
 cp $BIN_DIR/render_template $BUILD_DIR/bin
+cp $SUPPORT_DIR/nginx.slt $BUILD_DIR/vendor
 source $BUILD_DIR/OPENRESTY
