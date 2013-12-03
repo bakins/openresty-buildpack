@@ -8,6 +8,9 @@ BIN_DIR=$(cd $(dirname $0); cd ..; pwd)/bin
 LIB_DIR=$(cd $(dirname $0); cd ..; pwd)/lib
 SUPPORT_DIR=$(cd $(dirname $0); cd ..; pwd)/support
 
+ROCKS_TREE=$BUILD_DIR/lua_modules
+mkdir -p $ROCKS_TREE
+
 export LD_LIBRARY_PATH="$BUILD_DIR/vendor/openresty/embedded/lib:$LD_LIBRARY_PATH"
 export LUA_CPATH="$BUILD_DIR/vendor/openresty/embedded/luajit/lib/lua/5.1/?.so;;"
 export LUA_PATH="$BUILD_DIR/vendor/openresty/embedded/luajit/share/lua/5.1/?.lua;;"
@@ -57,8 +60,7 @@ EOF
     cp $LIB_DIR/slt2.lua $BUILD_DIR/vendor/openresty/embedded/luajit/share/lua/5.1
 }
 
-TREE=$BUILD_DIR/vendor/rocks
-mkdir -p $TREE
+
 
 LUAROCKS="$BUILD_DIR/bin/luajit $BUILD_DIR/bin/luarocks"
 
@@ -66,7 +68,7 @@ function rock {
     ROCK=$1
     echo $LUA_PATH
     VERSION=$2
-    $LUAROCKS install --tree=$TREE $ROCK $VERSION
+    $LUAROCKS install --tree=$ROCKS_TREE $ROCK $VERSION
 }
 
 

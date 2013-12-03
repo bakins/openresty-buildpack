@@ -7,6 +7,7 @@ export PORT=${PORT:-5000}
 export WORKERS=${WORKERS:-4}
 export CONNECTIONS=${CONNECTIONS:-8192}
 export APP=${APP:-"app"}
+
 export LUA_CPATH="./vendor/openresty/embedded/luajit/lib/lua/5.1/?.so;;"
 export LUA_PATH="./vendor/openresty/embedded/luajit/share/lua/5.1/?.lua;;"
 

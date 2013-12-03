@@ -9,8 +9,8 @@ events {
 }
 
 http {
-    lua_package_path "?.lua;#{= os.getenv("LUA_PATH") };;";
-    lua_package_cpath "#{= os.getenv("LUA_CPATH") };;";
+    lua_package_path "?.lua;$prefix/lua_modules/share/lua/5.1/?.lua;#{= os.getenv("LUA_PATH") };;";
+    lua_package_cpath "$prefix/lua_modules/lib/lua/5.1/?.so;#{= os.getenv("LUA_CPATH") };;";
 
     init_by_lua 'require("#{= os.getenv("APP") }")';
 
