@@ -27,7 +27,7 @@ function openresty {
     pushd $BUILD_DIR/bin
     ln -sf ../vendor/openresty-$VERSION/nginx/sbin/nginx nginx
     ln -sf ../vendor/openresty-$VERSION/luajit/bin/luajit luajit
-    ln -sf ../vendor/openresty/luarocks/bin/luarocks-5.1 luarocks
+    ln -sf ../vendor/openresty/luarocks/bin/luarocks luarocks
     popd
 
     mkdir -p $BUILD_DIR/vendor/openresty/luarocks/share/lua/5.1/luarocks/
