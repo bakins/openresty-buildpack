@@ -11,9 +11,14 @@ export APP=${APP:-"app"}
 export LUA_CPATH="./vendor/openresty/embedded/luajit/lib/lua/5.1/?.so;;"
 export LUA_PATH="./vendor/openresty/embedded/luajit/share/lua/5.1/?.lua;;"
 
-if [ -r config.slt ]; then
-    luajit bin/render_template config.slt > tmp/config.conf
-    export NGINX_INCLUDE=config.conf
+if [ -r server.slt ]; then
+    luajit bin/render_template server.slt > tmp/server.conf
+    export NGINX_SERVER_INCLUDE=server.conf
+fi
+
+if [ -r http.slt ]; then
+    luajit bin/render_template http.slt > tmp/http.conf
+    export NGINX_HTTP_INCLUDE=http.conf
 fi
 
 luajit bin/render_template vendor/nginx.slt > tmp/nginx.conf

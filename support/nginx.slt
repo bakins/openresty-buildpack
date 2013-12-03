@@ -29,11 +29,15 @@ http {
     #{= v }_temp_path ./tmp/#{= v }_temp 1 1;
     #{ end }
 
+    #{ if os.getenv("NGINX_HTTP_INCLUDE") then }
+    include #{= os.getenv("NGINX_HTTP_INCLUDE") };
+    #{ end }
+
     server {
         listen #{= os.getenv("PORT") };
 
-        #{ if os.getenv("NGINX_INCLUDE") then }
-        include #{= os.getenv("NGINX_INCLUDE") };
+        #{ if os.getenv("NGINX_SERVER_INCLUDE") then }
+        include #{= os.getenv("NGINX_SERVER_INCLUDE") };
         #{ end }
 
         location / {
